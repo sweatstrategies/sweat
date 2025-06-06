@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Danke!</title>
+
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq)return;n=f.fbq=function(){
+        n.callMethod ? n.callMethod.apply(n,arguments) : n.queue.push(arguments)
+      };
+      if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src='https://connect.facebook.net/en_US/fbevents.js';
+      s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    }(window, document,'script');
+    
+    fbq('init', '1153280869942223'); 
+    fbq('track', 'PageView');
+    fbq('track', 'Lead'); // Conversion Event
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=1153280869942223&ev=PageView&noscript=1"/>
+  </noscript>
+  <!-- End Meta Pixel Code -->
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f7f7f7;
+      color: #333;
+      text-align: center;
+      padding: 5em 1em;
+    }
+    h1 {
+      font-size: 2em;
+      color: #2e7d32;
+    }
+    p {
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Danke für deine Nachricht!</h1>
+  <p>Wir haben dein Formular erfolgreich erhalten.</p>
+</body>
+</html>
+
