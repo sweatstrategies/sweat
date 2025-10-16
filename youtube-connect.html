@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>YouTube Fan Account Connect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Fonts: Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body { 
@@ -14,6 +13,7 @@
       text-align: center; 
       background-color: #121212; 
       color: #ffffff;
+      padding: 20px;
     }
     input, button { 
       width: 100%; 
@@ -23,6 +23,7 @@
       border-radius: 8px;
       border: none;
       font-family: 'Manrope', sans-serif;
+      box-sizing: border-box;
     }
     input {
       background-color: #1e1e1e;
@@ -41,50 +42,64 @@
     button:hover {
       background: #e60000;
     }
+    button:disabled {
+      background: #666666;
+      cursor: not-allowed;
+    }
     #status {
       margin-top: 20px;
       font-size: 14px;
       color: #bbbbbb;
+    }
+    .success {
+      color: #4CAF50;
+    }
+    .error {
+      color: #ff4444;
     }
   </style>
 </head>
 <body>
   <h2>🔗 Connect Your YouTube Fan Account</h2>
   <p>Enter your Artist Name and click Connect</p>
-
   <input id="artist" placeholder="Artist Name" required>
-  <button onclick="connectYouTube()">Connect with YouTube</button>
-
+  <button id="connectBtn" onclick="connectYouTube()">Connect with YouTube</button>
   <p id="status"></p>
-
   <script>
-    // CONFIG: Replace these with your own
-    const CLIENT_ID = "341856625967-0tr0774pb8obj2ukdco2d7bp6htnvlhd.apps.googleusercontent.com";
-    const REDIRECT_URI = "https://script.google.com/macros/s/AKfycbyJ8iZBvxx6puIl5ff-hJ7zsOCAdvlVZdubgRmOwbQ4NHyt2WwkYymb5jj8RVbD7Q-x/exec"; // Web App URL from Apps Script
-    const SCOPE = "https://www.googleapis.com/auth/youtube.readonly";
-
+    // CONFIG: Replace with your Apps Script Web App URL
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJ8iZBvxx6puIl5ff-hJ7zsOCAdvlVZdubgRmOwbQ4NHyt2WwkYymb5jj8RVbD7Q-x/exec";
+    
     function connectYouTube() {
       const artist = document.getElementById("artist").value.trim();
       const status = document.getElementById("status");
+      const btn = document.getElementById("connectBtn");
+      
       if (!artist) {
+        status.className = "error";
         status.textContent = "❌ Please enter your Artist Name.";
         return;
       }
-
-      status.textContent = "Redirecting to Google...";
-
-      // state parameter = Artist Name, so we can retrieve it after OAuth
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth` +
-        `?client_id=${CLIENT_ID}` +
-        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-        `&response_type=code` +
-        `&scope=${encodeURIComponent(SCOPE)}` +
-        `&access_type=offline` +    // ensures we get a refresh token
-        `&prompt=consent` +         // forces approval first time
-        `&state=${encodeURIComponent(artist)}`;
-
-      // redirect to Google OAuth
-      window.location.href = authUrl;
+      
+      status.className = "";
+      status.textContent = "Redirecting to authentication...";
+      btn.disabled = true;
+      
+      // Send artist name to Apps Script, which will handle OAuth
+      const redirectUrl = `${APPS_SCRIPT_URL}?action=start&artist=${encodeURIComponent(artist)}`;
+      window.location.href = redirectUrl;
+    }
+    
+    // Check if we returned from OAuth with success/error
+    const urlParams = new URLSearchParams(window.location.search);
+    const result = urlParams.get('result');
+    const status = document.getElementById("status");
+    
+    if (result === 'success') {
+      status.className = "success";
+      status.textContent = "✅ Successfully connected! Your channel data has been saved.";
+    } else if (result === 'error') {
+      status.className = "error";
+      status.textContent = "❌ Connection failed. Please try again.";
     }
   </script>
 </body>
