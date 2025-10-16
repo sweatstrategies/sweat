@@ -66,41 +66,54 @@
   <button id="connectBtn" onclick="connectYouTube()">Connect with YouTube</button>
   <p id="status"></p>
   <script>
-    // CONFIG: Replace with your Apps Script Web App URL
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUZDXG2ePETYC0XlKPYOG_AIuoCc9Hz6v8VTyRbEf1NP-BYkMAs0aWV3ANpAZLEmIO/exec";
-    
-    function connectYouTube() {
-      const artist = document.getElementById("artist").value.trim();
-      const status = document.getElementById("status");
-      const btn = document.getElementById("connectBtn");
-      
-      if (!artist) {
-        status.className = "error";
-        status.textContent = "❌ Please enter your Artist Name.";
-        return;
-      }
-      
-      status.className = "";
-      status.textContent = "Redirecting to authentication...";
-      btn.disabled = true;
-      
-      // Send artist name to Apps Script, which will handle OAuth
-      const redirectUrl = `${APPS_SCRIPT_URL}?action=start&artist=${encodeURIComponent(artist)}`;
-      window.location.href = redirectUrl;
-    }
-    
-    // Check if we returned from OAuth with success/error
-    const urlParams = new URLSearchParams(window.location.search);
-    const result = urlParams.get('result');
+  // CONFIG: Replace with your Apps Script Web App URL
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEbIYui7jiculaFNXoZmTIFdaoth-dFdUBGuI3JFQVIY0uUy-GKF9ihtYvsUBH842Y/exec"; // Deine neue GAS-URL
+  
+  function connectYouTube() {
+    const artist = document.getElementById("artist").value.trim();
     const status = document.getElementById("status");
+    const btn = document.getElementById("connectBtn");
     
-    if (result === 'success') {
-      status.className = "success";
-      status.textContent = "✅ Successfully connected! Your channel data has been saved.";
-    } else if (result === 'error') {
+    if (!artist) {
       status.className = "error";
-      status.textContent = "❌ Connection failed. Please try again.";
+      status.textContent = "❌ Please enter your Artist Name.";
+      return;
     }
-  </script>
+    
+    status.className = "";
+    status.textContent = "Redirecting to authentication...";
+    btn.disabled = true;
+    
+    fetch(APPS_SCRIPT_URL + "?action=start&artist=" + encodeURIComponent(artist))
+      .then(response => response.json())
+      .then(data => {
+        if (data.redirect) {
+          window.location.href = data.redirect;
+        } else {
+          status.className = "error";
+          status.textContent = "❌ Failed to get redirect URL.";
+          btn.disabled = false;
+        }
+      })
+      .catch(error => {
+        status.className = "error";
+        status.textContent = "❌ Connection failed: " + error;
+        btn.disabled = false;
+      });
+  }
+  
+  // Check if we returned from OAuth with success/error
+  const urlParams = new URLSearchParams(window.location.search);
+  const result = urlParams.get('result');
+  const status = document.getElementById("status");
+  
+  if (result === 'success') {
+    status.className = "success";
+    status.textContent = "✅ Successfully connected! Your channel data has been saved.";
+  } else if (result === 'error') {
+    status.className = "error";
+    status.textContent = "❌ Connection failed. Please try again.";
+  }
+</script>
 </body>
 </html>
